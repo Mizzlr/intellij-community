@@ -1,0 +1,64 @@
+// Copyright 2000-2018 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE file.
+package com.intellij.util;
+
+import com.intellij.lang.Language;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Iconable;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.testFramework.LightVirtualFile;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Objects;
+
+/**
+ * @author Konstantin Bulenkov
+ */
+class FileIconKey {
+  private final VirtualFile myFile;
+  private final Project myProject;
+  private final @Iconable.IconFlags int myFlags;
+  private final @Nullable Language myInitialLanguage;
+
+  FileIconKey(@NotNull VirtualFile file, Project project, @Iconable.IconFlags int flags) {
+    myFile = file;
+    myProject = project;
+    myFlags = flags;
+    myInitialLanguage = myFile instanceof LightVirtualFile ? ((LightVirtualFile)myFile).getLanguage() : null;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof FileIconKey)) return false;
+
+    FileIconKey that = (FileIconKey)o;
+    if (myFlags != that.myFlags) return false;
+    if (!myFile.equals(that.myFile)) return false;
+    if (!Objects.equals(myProject, that.myProject)) return false;
+
+    if (!Objects.equals(myInitialLanguage, that.myInitialLanguage)) return false;
+
+    return true;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = myFile.hashCode();
+    result = 31 * result + Objects.hashCode(myProject);
+    result = 31 * result + myFlags;
+    return result;
+  }
+
+  VirtualFile getFile() {
+    return myFile;
+  }
+
+  Project getProject() {
+    return myProject;
+  }
+
+  @Iconable.IconFlags int getFlags() {
+    return myFlags;
+  }
+}
